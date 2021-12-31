@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { gapi, loadAuth2 } from 'gapi-script'
+import { gapi, loadAuth2WithProps } from 'gapi-script'
+import { FcGoogle } from 'react-icons/fc'
 
-import './GoogleLogin.css';
-import GoogleConnector from '../services/GoogleConnector';
+import GoogleConnector from '../../utils/GoogleConnector';
 
 export const GoogleLogin = () => {
-	const [user, setUser] = useState<any>(null);
 	const [username, setUsername] = useState<string>();
 	const [isLoggedIn, setIsLoggedIn] = useState(false);
 	const [profilePicture, setProfilePicture] = useState<string>();
@@ -26,7 +25,7 @@ export const GoogleLogin = () => {
 
 	useEffect(() => {
 		const setAuth2 = async () => {
-			const auth2 = await loadAuth2(gapi, "83246947840-rsllh7coc7llp54j6cjq3pq3dpj5nupk.apps.googleusercontent.com", 'openid profile email https://www.googleapis.com/auth/spreadsheets')
+			const auth2 = await loadAuth2WithProps(gapi, { client_id: "83246947840-rsllh7coc7llp54j6cjq3pq3dpj5nupk.apps.googleusercontent.com", scope: 'openid profile email https://www.googleapis.com/auth/spreadsheets', ux_mode: 'redirect'})
 			if (auth2.isSignedIn.get()) {
 				connector.updateUser(auth2.currentUser.get())
 			} else {
@@ -39,7 +38,7 @@ export const GoogleLogin = () => {
 	useEffect(() => {
 		if (!isLoggedIn) {
 			const setAuth2 = async () => {
-				const auth2 = await loadAuth2(gapi, "83246947840-rsllh7coc7llp54j6cjq3pq3dpj5nupk.apps.googleusercontent.com", 'openid profile email https://www.googleapis.com/auth/spreadsheets')
+				const auth2 = await loadAuth2WithProps(gapi, { client_id: "83246947840-rsllh7coc7llp54j6cjq3pq3dpj5nupk.apps.googleusercontent.com", scope: 'openid profile email https://www.googleapis.com/auth/spreadsheets', ux_mode: 'redirect'})
 				attachSignin(document.getElementById('login_button'), auth2);
 			}
 			setAuth2();
@@ -64,21 +63,22 @@ export const GoogleLogin = () => {
 	}
 
 	return (
+		<>
+			{isLoggedIn ? 
+				<>
+					<a className="header_account_auth logout" onClick={signOut}>
+						Logout
+					</a>
+					<div className='header_account'>
+						<div className='header_account_username'>{username}</div>
+						<img className='header_account_profilePicture' src={profilePicture} alt="Profile picture" />
+					</div>
+				</> : null}
 
-		<div className="container">
-			{isLoggedIn ? <>
-			<div>
-				<h2>{username}</h2>
-				<img src={profilePicture} alt="user profile" />
-			</div>
-			<div id="" className="btn logout" onClick={signOut}>
-				Logout
-			</div></> : null}
 
-
-			<div style={{"display": isLoggedIn ? 'none' : 'inherit'}} id="login_button" className="btn login">
-				Login
-			</div>
-		</div>
+			<a style={{ "display": isLoggedIn ? 'none' : 'inherit' }} id="login_button" className="header_account_auth login">
+				<FcGoogle /> Login
+			</a>
+		</>
 	);
 }

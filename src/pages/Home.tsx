@@ -1,18 +1,17 @@
 import { useState, useEffect, SetStateAction } from 'react';
 
 
-import { GoogleLogin } from '../components/GoogleLogin';
+import { GoogleLogin } from '../components/header/GoogleLogin';
 
-import logo from '../logo.svg';
+import logo from '../images/logo.svg';
 
 
 function Home() {
   
   return (
     <div className="App">
-      <header className="App-header">
+      <div className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <GoogleLogin/>
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
         </p>
@@ -24,7 +23,7 @@ function Home() {
         >
           Learn React
         </a>
-      </header>
+      </div>
     </div>
   );
 }

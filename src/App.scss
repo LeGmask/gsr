@@ -1,3 +1,11 @@
+@import "./scss/reset";
+@import "./scss/colors";
+@import "./scss/fonts";
+
+body {
+  font-family: 'Rubik';
+}
+
 .App {
   text-align: center;
 }
@@ -32,6 +40,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

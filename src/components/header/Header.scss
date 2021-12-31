@@ -1,0 +1,86 @@
+@import "../../scss/colors";
+
+.header {
+	background-color: $nordDark;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0 2vw;
+	box-shadow: 0 1px 4px rgba(0,0,0,.15);
+
+	&_logo {
+		display: flex;
+		align-items: center;
+		justify-content: space-around;
+		font-size: 32px;
+		font-weight: 500;
+		color: $nord6;
+		text-decoration: none;
+
+		img {
+			margin-right: 10px;
+			max-height: 60px;
+		}
+	}
+
+	&_account {
+		display: flex;
+		align-items: center;
+		justify-content: space-around;
+
+		&_auth { // login, logout button
+			border: 1px solid;
+			height: 26px;
+			text-decoration: none;
+			margin: 0 3px;
+			padding: 2px 10px;
+			border-radius: 6px;
+			line-height: 26px;
+			cursor: pointer;
+			font-weight: 500;
+			transition: all .3s ease-in-out;
+			vertical-align: middle;
+			font-size: 14px;
+			padding-bottom: 3px;
+			line-height: 1.4em;
+			align-items: center;
+			justify-content: space-between;
+
+			& svg{
+				margin-right: 3px;
+			}
+
+			&.logout {
+				// border-color: lighten($nord11, 10%);
+				color: $nord11;
+				&:hover {
+					color: $nord6;
+					background-color: $nord11;
+					border-color: $nord11;
+				}
+			}
+
+			&.login {
+				// border-color: lighten($nord11, 10%);
+				color: $nord10;
+				&:hover {
+					color: $nord6;
+					background-color: $nord10;
+					border-color: $nord10;
+				}
+			}
+		}
+
+		&_username {
+			font-size: 18px;
+			font-weight: 300;
+			margin: 1vw;
+			color: $nord6;
+		}
+
+		&_profilePicture {
+			border-radius: 100%;
+			max-height: 40px;
+		}
+	}
+}
