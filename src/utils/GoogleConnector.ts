@@ -1,6 +1,3 @@
-import { gapi } from 'gapi-script'
-
-
 export default class GoogleConnector {
 	static __instance: GoogleConnector | null = null;
 

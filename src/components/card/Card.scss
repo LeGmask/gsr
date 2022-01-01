@@ -1,0 +1,61 @@
+@import "../../scss/colors";
+
+
+
+.card {
+	background-color: $nord2;
+	padding: 15px;
+	border-radius: 20px;
+	color: $nord6;
+	margin: 10px;
+	box-shadow: 0 1px 4px rgba(0,0,0,.15);
+	max-width: 400px;
+
+
+	&_date {
+		text-align: center;
+		font-size: 36px;
+		margin-top: 10px;
+	}
+
+	&_options_item {
+		transition: all ease-in 3s;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-top: 30px;
+		background-color: $nord3;
+		border-radius: 10px;
+		height: 70px;
+
+		&_text {
+			font-size: 24px;
+			text-align: center;
+			padding: 20px;
+		}
+
+		&_control {
+			cursor: pointer;
+
+			&.regular {
+				background-color: $nord14;
+				border-radius: 10px;
+			}
+
+			&.warning {
+				background-color: $nord12;
+				border-radius: 10px;
+			}
+
+			&.error {
+				background-color: $nord11;
+				border-radius: 10px;
+			}
+
+			svg {
+				height: 70px;
+				width: 68px;
+			}
+		}
+	}
+}
