@@ -47,6 +47,7 @@ export const GoogleLogin = () => {
 		const auth2 = gapi.auth2.getAuthInstance();
 		auth2.signOut().then(() => {
 			setUser(null)
+			localStorage.removeItem("accessToken")
 			console.log('User signed out.');
 		});
 	}
