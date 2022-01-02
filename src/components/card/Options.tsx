@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { RegisterButton, State } from './registerButton';
+import { RegisterButton, State } from './RegisterButton';
 
 export interface IOptionsProps {
 }

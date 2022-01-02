@@ -3,6 +3,7 @@ import { Card } from '../components/card/Card';
 
 
 import { GoogleLogin } from '../components/header/GoogleLogin';
+import { NameManager } from '../components/nameManager/NameManager';
 
 import logo from '../images/logo.svg';
 import "./Home.scss"
@@ -28,11 +29,14 @@ function Home() {
   //   </div>
   // );
   return (
+    <>
+    <NameManager />
     <div className="cards_container">
       <Card/>
       <Card/>
       <Card/>
     </div>
+    </>
   )
 }
 
