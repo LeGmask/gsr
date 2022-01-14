@@ -3,7 +3,8 @@ import { NameInput } from './NameInput';
 import { MdPersonAdd } from "react-icons/md"
 
 import "./NameManager.scss"
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { NamesContext } from '../NamesManagerContext';
 
 export interface INameManagerProps {
 }
@@ -13,31 +14,20 @@ export interface Name {
 	vege: boolean,
 }
 
-const loadFromLocalStorage = (): Array<Name> => {
-	let local = localStorage.getItem('names');
-	if (local) {
-		return JSON.parse(local)
-	} else {
-		return [{
-			name: "",
-			vege: false,
-		}]
-	}
-}
 
 const writeLocalStorage = (names: Array<Name>) => {
 	localStorage.setItem('names', JSON.stringify(names))
 }
 
 export function NameManager(props: INameManagerProps) {
-	const [names, setNames] = useState<Array<Name>>(loadFromLocalStorage)
+	const { names, setNames } = useContext(NamesContext)
 
 	useEffect(() => {
         writeLocalStorage(names)
     }, [names])
 
 	const handleAddName = () => {
-		setNames((prevNames) => [
+		setNames((prevNames:any) => [
 			...prevNames,
 			{ name: "", vege: false, },
 		]);

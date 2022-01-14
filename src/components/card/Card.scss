@@ -35,14 +35,15 @@
 		}
 
 		&_control {
-			cursor: pointer;
 
 			&.regular {
+				cursor: pointer;
 				background-color: $nord14;
 				border-radius: 10px;
 			}
 
 			&.warning {
+				cursor: pointer;
 				background-color: $nord12;
 				border-radius: 10px;
 			}

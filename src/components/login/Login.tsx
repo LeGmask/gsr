@@ -1,9 +1,16 @@
-import { useState, useEffect, SetStateAction } from 'react';
+import { useState, useEffect, SetStateAction, useContext } from 'react';
 import { BiError } from "react-icons/bi"
+import { Navigate } from 'react-router-dom';
+import { LoginContext } from '../LoginContext';
 
 import "./Login.scss";
 
 function Login() {
+	const {user, setUser} = useContext(LoginContext);
+
+	if (user) {
+		return <Navigate to={'/'}/>
+	}
 	return (
 		<>
 			<div className="login-alert">

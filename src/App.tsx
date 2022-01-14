@@ -1,14 +1,17 @@
-import { useContext, useEffect, useState } from 'react';
+import { ReactChild, ReactChildren, useContext, useEffect, useState } from 'react';
 
 import './App.scss';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { LoginContext } from "./components/LoginContext"
-import { Test } from './pages/Test';
 import { Header } from './components/header/Header';
 import Main from './pages/Main';
+import Login from './components/login/Login';
+import { Name } from './components/nameManager/NameManager';
+import { loadFromLocalStorage, NamesContext } from './components/NamesManagerContext';
 
 function App() {
 	const [user, setUser] = useState<any>();
+	const [names, setNames] = useState<Name[]>(loadFromLocalStorage());
 	const setLoginInfo = (user:any) => {
 		console.log('Called setLoginInfo')
 		setUser(user)
@@ -16,13 +19,25 @@ function App() {
 
 	return (
 		<LoginContext.Provider value={{user: user, setUser: setLoginInfo}}>
-			<Header />
-			<Routes>
-				<Route path="/" element={<Main />} />
-				<Route path="/test" element={<Test />} />
-			</Routes>
+			<NamesContext.Provider value={{names: names, setNames: setNames}}>
+				<Header />
+				<Routes>
+					<Route path="/" element={<RequireAuth redirectTo="/login"><Main /></RequireAuth>} />
+					<Route path="/login" element={<Login />} />
+				</Routes>
+			</NamesContext.Provider>
 		</LoginContext.Provider>
 	);
+}
+
+interface IRequireAuthProps{
+	children: ReactChild | ReactChildren
+	redirectTo: string
+}
+
+function RequireAuth({ children, redirectTo }: IRequireAuthProps) {
+	const {user, setUser} = useContext(LoginContext);
+	return user ? <>{children}</> : <Navigate to={redirectTo} />;
 }
 
 export default App;
