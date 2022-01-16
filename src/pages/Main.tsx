@@ -9,6 +9,7 @@ import "./Home.scss"
 
 
 
+
 function Main() {
 	const [schemas, setSchemas] = useState<SchemasList>({})
 	const sheetApi = new SheetApi("1EQxmOav__awVA_sKOlNWvCluvBCyuFjTxsiJd2Q67ZA")
@@ -44,22 +45,22 @@ function Main() {
 		<SchemaContext.Provider value={{ schemas, setSchemas }}>
 			<NameManager />
 			{Object.keys(schemas).map((week, sheetIndex) => {
-					if (checkIfDisplayable(schemas[week].schema)) {
-						return <div key={sheetIndex}>
-							<h1>{week}, {sheetApi.correctIndex(sheetIndex)}</h1>
-							<div className="cards_container">
-								{
-									Object.keys(schemas[week].schema).map((day, index) => (
-										Object.keys(schemas[week].schema[day].options).length ?
-											<Card day={day} schemaDays={schemas[week].schema[day]} sheetIndex={sheetApi.correctIndex(sheetIndex)} index={index} sheetApi={sheetApi} sheetSplit={schemas[week].splits} key={index} />
-											: null
-									))
-								}
-							</div>
+				if (checkIfDisplayable(schemas[week].schema)) {
+					return <div key={sheetIndex}>
+						<h1 className='weeks_separator'>{capitalize(week)}</h1>
+						<div className="cards_container">
+							{
+								Object.keys(schemas[week].schema).map((day, index) => (
+									Object.keys(schemas[week].schema[day].options).length ?
+										<Card day={day} schemaDays={schemas[week].schema[day]} sheetIndex={sheetApi.correctIndex(sheetIndex)} index={index} sheetApi={sheetApi} sheetSplit={schemas[week].splits} key={index} />
+										: null
+								))
+							}
 						</div>
-					} 
-					return null
-				})
+					</div>
+				}
+				return null
+			})
 			}
 
 		</SchemaContext.Provider>
