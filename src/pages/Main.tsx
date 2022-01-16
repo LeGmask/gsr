@@ -3,7 +3,7 @@ import { Card } from '../components/card/Card';
 
 import { NameManager } from '../components/nameManager/NameManager';
 import { SchemaContext } from '../components/SchemaContext';
-import SheetApi, { SchemaDayInterface, SchemaInterface, SchemasList } from '../utils/GoogleApi';
+import SheetApi, { SchemaInterface, SchemasList } from '../utils/GoogleApi';
 
 import "./Home.scss"
 
@@ -28,7 +28,7 @@ function Main() {
 				}));
 			}
 		})()
-	}, [])
+	}, [sheetApi])
 
 	const checkIfDisplayable = (schema: SchemaInterface) => {
 		for (let day of Object.keys(schema)) {
@@ -57,7 +57,8 @@ function Main() {
 								}
 							</div>
 						</div>
-					}
+					} 
+					return null
 				})
 			}
 

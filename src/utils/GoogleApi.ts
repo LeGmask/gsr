@@ -1,5 +1,4 @@
-import { cp } from "fs";
-import { GoogleSpreadsheet, WorksheetGridRange } from "google-spreadsheet";
+import { GoogleSpreadsheet } from "google-spreadsheet";
 import { Name } from "../components/nameManager/NameManager";
 
 export interface SchemasList {
@@ -62,15 +61,6 @@ export default class SheetApi {
 		var result = new Date("12/30/1899");
 		result.setDate(result.getDate() + days);
 		return result;
-	}
-
-	private numberToLetters(num: number) {
-		let letters = ''
-		while (num >= 0) {
-			letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[num % 26] + letters
-			num = Math.floor(num / 26) - 1
-		}
-		return letters
 	}
 
 	async getSchema(sheetIndex: number) {
@@ -204,8 +194,8 @@ export default class SheetApi {
 				remove.push(place)
 			}
 		}
-		places = places.filter(function(value, index) {
-			return remove.indexOf(value) == -1;
+		places = places.filter(function(value) {
+			return remove.indexOf(value) === -1;
 	   	})
 
 		for (let name of names) {

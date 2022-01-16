@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { gapi, loadAuth2WithProps } from 'gapi-script'
 import { FcGoogle } from 'react-icons/fc'
 
@@ -13,6 +13,15 @@ export const GoogleLogin = () => {
 		setUser(googleUser.getBasicProfile())
 	}
 
+	const attachSignin = (element: any, auth2: any) => {
+		auth2.attachClickHandler(element, {},
+			(googleUser: any) => {
+				updateUser(googleUser)
+			}, (error: any) => {
+				console.log(JSON.stringify(error))
+			});
+	};
+
 	useEffect(() => {
 		const setAuth2 = async () => {
 			const auth2 = await loadAuth2WithProps(gapi, { client_id: "83246947840-rsllh7coc7llp54j6cjq3pq3dpj5nupk.apps.googleusercontent.com", scope: 'openid profile email https://www.googleapis.com/auth/spreadsheets', ux_mode: 'redirect'})
@@ -23,7 +32,7 @@ export const GoogleLogin = () => {
 			}
 		}
 		setAuth2();
-	}, []);
+	}, [attachSignin, updateUser]);
 
 	useEffect(() => {
 		if (!user) {
@@ -33,16 +42,7 @@ export const GoogleLogin = () => {
 			}
 			setAuth2();
 		}
-	}, [user])
-
-	const attachSignin = (element: any, auth2: any) => {
-		auth2.attachClickHandler(element, {},
-			(googleUser: any) => {
-				updateUser(googleUser)
-			}, (error: any) => {
-				console.log(JSON.stringify(error))
-			});
-	};
+	}, [user, attachSignin])
 
 	const signOut = () => {
 		const auth2 = gapi.auth2.getAuthInstance();
@@ -63,7 +63,7 @@ export const GoogleLogin = () => {
 					</a>
 					<div className='header_account'>
 						<div className='header_account_username'>{user.getName()}</div>
-						<img className='header_account_profilePicture' src={user.getImageUrl()} alt="Profile picture" />
+						<img className='header_account_profilePicture' src={user.getImageUrl()} alt="Profile" />
 					</div>
 				</> : null}
 
