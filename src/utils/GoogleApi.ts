@@ -161,9 +161,25 @@ export default class SheetApi {
 		let places: number[] | undefined = this.findMissing(keys, schemaOption.count + 1) // all possible places in the sheet
 
 		const sheet = this.doc.sheetsByIndex[sheetIndex]; // or use doc.sheetsById[id] or doc.sheetsByTitle[title]
-		await sheet.loadCells({ // GridRange object
-			startRowIndex: 2, endRowIndex: schemaOption.count + 1, startColumnIndex:column, endColumnIndex: column+1
+		await sheet.loadCells({ // GridRange object, +2 because it's [A;B[  interval ...
+			startRowIndex: 2, endRowIndex: schemaOption.count + 2, startColumnIndex:column, endColumnIndex: column+1
 		});
+
+		// drop updated cell
+		let remove: Number[] = []
+		for (let place of places) {
+			// console.log(place)
+			let cell = sheet.getCell(place, column)
+			if (cell.value !== null) {
+				schemaOption.registered[places[place]] = {value: String(cell.value), note: cell.note}
+				remove.push(place)
+			}
+		}
+		console.log(remove)
+		places = places.filter(function(value, index) {
+			return remove.indexOf(value) == -1;
+	   	})
+
 		for (let name of names) {
 			if (places.length) {
 				let cell = sheet.getCell(places[0], column)
@@ -171,7 +187,9 @@ export default class SheetApi {
 				cell.note = `gsr-${localStorage.getItem("userID")}`
 				schemaOption.registered[places[0]] = {value: name.name + (name.vege ? " Vege" : ""), note: `gsr-${localStorage.getItem("userID")}`}
 				places.shift()
-			}
+			} else {
+				console.log("ya plus de place ...")
+			}			
 		}
 		schemaDay.registered = true
 		schemaDay.options[optionIndex] = schemaOption
