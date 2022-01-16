@@ -3,7 +3,7 @@ import { Card } from '../components/card/Card';
 
 import { NameManager } from '../components/nameManager/NameManager';
 import { SchemaContext } from '../components/SchemaContext';
-import SheetApi, { SchemasList } from '../utils/GoogleApi';
+import SheetApi, { SchemaDayInterface, SchemaInterface, SchemasList } from '../utils/GoogleApi';
 
 import "./Home.scss"
 
@@ -20,7 +20,7 @@ function Main() {
 			for (let i = sheetApi.disabled; i < sheetNumber; i++) {
 				let sheet = await sheetApi.getSchema(i)
 				setSchemas((prevSchemas) => ({
-					...prevSchemas, 
+					...prevSchemas,
 					[sheet.week]: {
 						schema: sheet.schema,
 						splits: sheet.split,
@@ -30,24 +30,37 @@ function Main() {
 		})()
 	}, [])
 
+	const checkIfDisplayable = (schema: SchemaInterface) => {
+		for (let day of Object.keys(schema)) {
+			if (Object.keys(schema[day].options).length) {
+				return true
+			}
+		}
+		return false
+
+	}
 
 	return (
-		<SchemaContext.Provider value={{schemas, setSchemas}}>
+		<SchemaContext.Provider value={{ schemas, setSchemas }}>
 			<NameManager />
-			{Object.keys(schemas).map((week, sheetIndex) => (
-
-				<>
-					<h1>{week}, {sheetApi.correctIndex(sheetIndex)}</h1>
-					<div className="cards_container">
-					{
-						Object.keys(schemas[week].schema).map((day, index) => (
-							<Card day={day} schemaDays={schemas[week].schema[day]} sheetIndex={sheetApi.correctIndex(sheetIndex)} index={index} sheetApi={sheetApi} sheetSplit={schemas[week].splits} key={index}/>
-						))
+			{Object.keys(schemas).map((week, sheetIndex) => {
+					if (checkIfDisplayable(schemas[week].schema)) {
+						return <div key={sheetIndex}>
+							<h1>{week}, {sheetApi.correctIndex(sheetIndex)}</h1>
+							<div className="cards_container">
+								{
+									Object.keys(schemas[week].schema).map((day, index) => (
+										Object.keys(schemas[week].schema[day].options).length ?
+											<Card day={day} schemaDays={schemas[week].schema[day]} sheetIndex={sheetApi.correctIndex(sheetIndex)} index={index} sheetApi={sheetApi} sheetSplit={schemas[week].splits} key={index} />
+											: null
+									))
+								}
+							</div>
+						</div>
 					}
-					</div>
-				</>
-			))}
-			
+				})
+			}
+
 		</SchemaContext.Provider>
 	)
 

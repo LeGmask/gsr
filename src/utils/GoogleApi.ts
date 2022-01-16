@@ -1,4 +1,5 @@
-import { GoogleSpreadsheet } from "google-spreadsheet";
+import { cp } from "fs";
+import { GoogleSpreadsheet, WorksheetGridRange } from "google-spreadsheet";
 import { Name } from "../components/nameManager/NameManager";
 
 export interface SchemasList {
@@ -57,20 +58,33 @@ export default class SheetApi {
 		return index + this.disabled
 	}
 
+	private addDays(days: number) {
+		var result = new Date("12/30/1899");
+		result.setDate(result.getDate() + days);
+		return result;
+	}
+
+	private numberToLetters(num: number) {
+		let letters = ''
+		while (num >= 0) {
+			letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[num % 26] + letters
+			num = Math.floor(num / 26) - 1
+		}
+		return letters
+	}
+
 	async getSchema(sheetIndex: number) {
 
 		await this.doc.loadInfo(); // loads document properties and worksheets
 
 
-		const sheet = this.doc.sheetsByIndex[sheetIndex]; // or use doc.sheetsById[id] or doc.sheetsByTitle[title]
+		const sheet = this.doc.sheetsByIndex[sheetIndex]; 
 		await sheet.loadHeaderRow()
 
-		let days = sheet.headerValues.filter(e => e); // drop empty strings
+		let days = sheet.headerValues.filter(e => e); 
 
 
-
-
-		await sheet.loadCells('A2:Z2');
+		await sheet.loadCells('A1:Z2');
 		let options: Array<string> = []
 		for (let i = 0; sheet.getCell(1, i).value; i++) {
 			options.push(String(sheet.getCell(1, i).value))
@@ -83,9 +97,23 @@ export default class SheetApi {
 			schema[days[i]] = Object(options.slice(Number(i) * split, (Number(i) + 1) * split))
 		}
 
-		await sheet.loadCells('A3:Z100')
-		for (let day in Object.keys(schema)) {
+		// Here we drop allready passed days
+		let ignoreIndex: Number[] = []
+		for (let i in days) {
+			let date = this.addDays(Number(sheet.getCell(0, Number(i) * split).value))
+			let today = new Date(Date.now())
+			today.setHours(0,0,0,0) // set today to midnight to permit comparaison between date and today
+			if (date < today) {
+				ignoreIndex.push(Number(i))
+			}
+		}
 
+		// TODO: avoid loading when not need by simply adding an empty object ... (and symplify main.tsx)
+		// Load sheets
+		await sheet.loadCells('A2:Z100')
+
+
+		for (let day in Object.keys(schema)) {
 			let key = Object.keys(schema)[day];
 			let schemaDay: SchemaDayInterface = {
 				registered: false,
@@ -93,42 +121,45 @@ export default class SheetApi {
 				options: []
 			}
 
-			for (let option in schema[key]) {
-				let temp: any = schema[key]
-				let column = Number(day) * split + Number(option)
-				var schemaOptions: SchemaOptionInterface = {
-					count: 0,
-					string: temp[option],
-					registered: {}
-				}
-				try { // dirty try catch but sometimes borders value is inacessible and dunno why but that permit to fix the script ...
-					for (let i = 2; sheet.getCell(i, column).borders || sheet.getCell(i+1, column).borders; i++) {
-						schemaOptions.count++
-						let cell = sheet.getCell(i, column)
-						if (cell.value && cell.valueType === "stringValue") {
-							schemaOptions.registered[Number(i)] = {value: String(cell.value), note:cell.note}
-						} else if (cell.value && cell.valueType === "numberValue") {
-							schemaDay.locked = true
-						}
+			// skip if day allready passed ...
+			if (ignoreIndex.indexOf(Number(day)) === -1) {
+				for (let option in schema[key]) {
+					let temp: any = schema[key]
+					let column = Number(day) * split + Number(option)
+					var schemaOptions: SchemaOptionInterface = {
+						count: 0,
+						string: temp[option],
+						registered: {}
+					}
+					try { // dirty try catch but sometimes borders value is inacessible and dunno why but that permit to fix the script ...
+						for (let i = 2; sheet.getCell(i, column).borders || sheet.getCell(i+1, column).borders; i++) {
+							schemaOptions.count++
+							let cell = sheet.getCell(i, column)
+							if (cell.value && cell.valueType === "stringValue") {
+								schemaOptions.registered[Number(i)] = {value: String(cell.value), note:cell.note}
+							} else if (cell.value && cell.valueType === "numberValue") {
+								schemaDay.locked = true
+							}
 
-						// Handle if register
-						if (cell.note ===  `gsr-${localStorage.getItem("userID")}`) {
-							schemaDay.registered = true
-						}
+							// Handle if register
+							if (cell.note ===  `gsr-${localStorage.getItem("userID")}`) {
+								schemaDay.registered = true
+							}
 
-						// Handle some bad case *
-						if (JSON.stringify(sheet.getCell(i, column).backgroundColor) === JSON.stringify({ red: 0.8, green: 0.8, blue: 0.8 }) ||
-							JSON.stringify(sheet.getCell(i, column).backgroundColor) === JSON.stringify({ red: 0.7411765, green: 0.7411765, blue: 0.7411765 })
-						) { // if cells are gray and gulf closed ..., if prod most simple is to avoid put these column just put nothing ^^
-							schemaDay.locked = true
+							// Handle some bad case *
+							if (JSON.stringify(sheet.getCell(i, column).backgroundColor) === JSON.stringify({ red: 0.8, green: 0.8, blue: 0.8 }) ||
+								JSON.stringify(sheet.getCell(i, column).backgroundColor) === JSON.stringify({ red: 0.7411765, green: 0.7411765, blue: 0.7411765 })
+							) { // if cells are gray and gulf closed ..., if prod most simple is to avoid put these column just put nothing ^^
+								schemaDay.locked = true
+							}
 						}
 					}
-				}
-				catch { }
+					catch { }
 
-				schemaDay.options.push(schemaOptions)
+					schemaDay.options.push(schemaOptions)
+				}
 			}
-			schema[key] = schemaDay
+			schema[key] = schemaDay // set default if not found
 		}
 		this.schema = schema
 		return {
@@ -150,7 +181,6 @@ export default class SheetApi {
 
 	async register(sheetIndex: number, column: number, names: Name[], schemas: SchemasList, split: number, cardIndex: number, optionIndex: number) {
 		await this.doc.loadInfo();
-		console.log(schemas[Object.keys(schemas)[sheetIndex - this.disabled]].schema)
 
 		// Get the correct schema option:
 		let schemasCopy = schemas
@@ -168,14 +198,12 @@ export default class SheetApi {
 		// drop updated cell
 		let remove: Number[] = []
 		for (let place of places) {
-			// console.log(place)
 			let cell = sheet.getCell(place, column)
 			if (cell.value !== null) {
 				schemaOption.registered[places[place]] = {value: String(cell.value), note: cell.note}
 				remove.push(place)
 			}
 		}
-		console.log(remove)
 		places = places.filter(function(value, index) {
 			return remove.indexOf(value) == -1;
 	   	})
