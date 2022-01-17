@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { MdOutlineSave } from "react-icons/md"
 import { Card } from '../components/card/Card';
 
 import { NameManager } from '../components/nameManager/NameManager';
@@ -29,7 +30,7 @@ function Main() {
 				}));
 			}
 		})()
-	}, [sheetApi])
+	}, [])
 
 	const checkIfDisplayable = (schema: SchemaInterface) => {
 		for (let day of Object.keys(schema)) {
@@ -43,6 +44,7 @@ function Main() {
 
 	return (
 		<SchemaContext.Provider value={{ schemas, setSchemas }}>
+
 			<NameManager />
 			{Object.keys(schemas).map((week, sheetIndex) => {
 				if (checkIfDisplayable(schemas[week].schema)) {
