@@ -53,6 +53,7 @@ export function NameManager(props: INameManagerProps) {
 
 	return (
 		<div className='nameManager_container'>
+			<h3 className="h3_helper">Step 2 ‒ Add the names of people you want to register:</h3>
 			<ul >
 				{names.map((val, id) => (
 					<li className='nameManager_input' key={id} ><NameInput name={val} updateName={(newName: Name) => (handleEditName(newName, id))} destroyable={names.length > 1} destroy={() => handleDestroyName(id)} /></li>

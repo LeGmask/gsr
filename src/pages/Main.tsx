@@ -4,6 +4,7 @@ import { Card } from '../components/card/Card';
 
 import { NameManager } from '../components/nameManager/NameManager';
 import { SchemaContext } from '../components/SchemaContext';
+import { SheetIdManager } from '../components/sheetId/SheetIdManager';
 import SheetApi, { SchemaInterface, SchemasList } from '../utils/GoogleApi';
 
 import "./Home.scss"
@@ -13,11 +14,11 @@ import "./Home.scss"
 
 function Main() {
 	const [schemas, setSchemas] = useState<SchemasList>({})
-	const sheetApi = new SheetApi("1EQxmOav__awVA_sKOlNWvCluvBCyuFjTxsiJd2Q67ZA")
+	var sheetApi = new SheetApi(localStorage.getItem('sheetId') || '')
 	const capitalize = (s: string) => s && s[0].toUpperCase() + s.slice(1)
 
-	useEffect(() => {
-		(async function run() {
+	async function updateSchema() {
+		if (localStorage.getItem('sheetId')) {
 			let sheetNumber = await sheetApi.getNumberOfSheets()
 			for (let i = sheetApi.disabled; i < sheetNumber; i++) {
 				let sheet = await sheetApi.getSchema(i)
@@ -29,7 +30,16 @@ function Main() {
 					}
 				}));
 			}
-		})()
+		}
+	}
+
+	function updateSheetId() {
+		sheetApi = new SheetApi(localStorage.getItem('sheetId') || '')
+		updateSchema()
+	}
+
+	useEffect(() => {
+		updateSchema()
 	}, [])
 
 	const checkIfDisplayable = (schema: SchemaInterface) => {
@@ -44,8 +54,9 @@ function Main() {
 
 	return (
 		<SchemaContext.Provider value={{ schemas, setSchemas }}>
-
+			<SheetIdManager updateSheetId={updateSheetId} />
 			<NameManager />
+			<h2 className="h2_helper">Step 3 ‒ Select days :</h2>
 			{Object.keys(schemas).map((week, sheetIndex) => {
 				if (checkIfDisplayable(schemas[week].schema)) {
 					return <div key={sheetIndex}>
