@@ -100,7 +100,9 @@ export default class SheetApi {
 
 		// TODO: avoid loading when not need by simply adding an empty object ... (and symplify main.tsx)
 		// Load sheets
-		await sheet.loadCells('A2:Z100')
+		if (ignoreIndex.length < days.length) {
+			await sheet.loadCells('A2:Z100')
+		}
 
 
 		for (let day in Object.keys(schema)) {
