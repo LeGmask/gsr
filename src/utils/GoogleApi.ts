@@ -28,7 +28,7 @@ export interface SchemaOptionInterface {
 export default class SheetApi {
 	doc: GoogleSpreadsheet;
 	schema: any;
-	userID: string | null;
+	userEmail: string | null;
 	disabled: number
 
 
@@ -36,7 +36,7 @@ export default class SheetApi {
 		// test doc : '18wEM5Qcl_gEL25EzoX3E2aWK-8YYlupZA9HoTZ4-MeU'
 		this.doc = new GoogleSpreadsheet(docID);
 		let token = localStorage.getItem("accessToken")
-		this.userID = localStorage.getItem("userID")
+		this.userEmail = localStorage.getItem("userEmail")
 		if (!token) {
 			throw new Error("invalid token")
 		}
@@ -134,7 +134,7 @@ export default class SheetApi {
 							}
 
 							// Handle if register
-							if (cell.note ===  `gsr-${localStorage.getItem("userID")}`) {
+							if (cell.note ===  `gsr-${localStorage.getItem("userEmail")}`) {
 								schemaDay.registered = true
 							}
 
@@ -204,8 +204,8 @@ export default class SheetApi {
 			if (places.length) {
 				let cell = sheet.getCell(places[0], column)
 				cell.value = name.name + (name.vege ? " Vege" : "")
-				cell.note = `gsr-${localStorage.getItem("userID")}`
-				schemaOption.registered[places[0]] = {value: name.name + (name.vege ? " Vege" : ""), note: `gsr-${localStorage.getItem("userID")}`}
+				cell.note = `gsr-${localStorage.getItem("userEmail")}`
+				schemaOption.registered[places[0]] = {value: name.name + (name.vege ? " Vege" : ""), note: `gsr-${localStorage.getItem("userEmail")}`}
 				places.shift()
 			} else {
 				console.log("ya plus de place ...")

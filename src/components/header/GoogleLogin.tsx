@@ -1,4 +1,5 @@
 import React, { useEffect, useContext } from 'react';
+import {Buffer} from 'buffer';
 import { gapi, loadAuth2WithProps } from 'gapi-script'
 import { FcGoogle } from 'react-icons/fc'
 
@@ -8,7 +9,7 @@ export const GoogleLogin = () => {
 	const {user, setUser} = useContext(LoginContext);
 
 	const updateUser = (googleUser: any) => {
-		localStorage.setItem('userID', googleUser.getBasicProfile().getId())
+		localStorage.setItem('userEmail', Buffer.from(googleUser.getBasicProfile().getEmail()).toString('base64'))
 		localStorage.setItem('accessToken', googleUser.getAuthResponse(true).access_token);
 		setUser(googleUser.getBasicProfile())
 	}
@@ -49,7 +50,7 @@ export const GoogleLogin = () => {
 		auth2.signOut().then(() => {
 			setUser(null)
 			localStorage.removeItem("accessToken")
-			localStorage.removeItem("userID")
+			localStorage.removeItem("userEmail")
 			console.log('User signed out.');
 		});
 	}
