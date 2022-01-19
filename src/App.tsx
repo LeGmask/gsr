@@ -8,6 +8,7 @@ import Main from './pages/Main';
 import Login from './components/login/Login';
 import { Name } from './components/nameManager/NameManager';
 import { loadFromLocalStorage, NamesContext } from './components/NamesManagerContext';
+import { Footer } from './components/footer/Footer';
 
 function App() {
 	const [user, setUser] = useState<any>();
@@ -21,10 +22,13 @@ function App() {
 		<LoginContext.Provider value={{user: user, setUser: setLoginInfo}}>
 			<NamesContext.Provider value={{names: names, setNames: setNames}}>
 				<Header />
-				<Routes>
-					<Route path="/" element={<RequireAuth redirectTo="/login"><Main /></RequireAuth>} />
-					<Route path="/login" element={<Login />} />
-				</Routes>
+				<div className="content">
+					<Routes>
+						<Route path="/" element={<RequireAuth redirectTo="/login"><Main /></RequireAuth>} />
+						<Route path="/login" element={<Login />} />
+					</Routes>
+				</div>
+				<Footer />
 			</NamesContext.Provider>
 		</LoginContext.Provider>
 	);
