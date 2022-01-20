@@ -25,7 +25,7 @@ export const GoogleLogin = () => {
 
 	useEffect(() => {
 		const setAuth2 = async () => {
-			const auth2 = await loadAuth2WithProps(gapi, { client_id: "83246947840-rsllh7coc7llp54j6cjq3pq3dpj5nupk.apps.googleusercontent.com", scope: 'openid profile email https://www.googleapis.com/auth/spreadsheets', ux_mode: 'redirect'})
+			const auth2 = await loadAuth2WithProps(gapi, { client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID, scope: 'openid profile email https://www.googleapis.com/auth/spreadsheets', ux_mode: 'redirect'})
 			if (auth2.isSignedIn.get()) {
 				updateUser(auth2.currentUser.get())
 			} else {
@@ -38,7 +38,7 @@ export const GoogleLogin = () => {
 	useEffect(() => {
 		if (!user) {
 			const setAuth2 = async () => {
-				const auth2 = await loadAuth2WithProps(gapi, { client_id: "83246947840-rsllh7coc7llp54j6cjq3pq3dpj5nupk.apps.googleusercontent.com", scope: 'openid profile email https://www.googleapis.com/auth/spreadsheets', ux_mode: 'redirect'})
+				const auth2 = await loadAuth2WithProps(gapi, { client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID, scope: 'openid profile email https://www.googleapis.com/auth/spreadsheets', ux_mode: 'redirect'})
 				attachSignin(document.getElementById('login_button'), auth2);
 			}
 			setAuth2();
