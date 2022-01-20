@@ -9,6 +9,7 @@ import Login from './components/login/Login';
 import { Name } from './components/nameManager/NameManager';
 import { loadFromLocalStorage, NamesContext } from './components/NamesManagerContext';
 import { Footer } from './components/footer/Footer';
+import { Policy } from './pages/Policy';
 
 function App() {
 	const [user, setUser] = useState<any>();
@@ -26,6 +27,7 @@ function App() {
 					<Routes>
 						<Route path="/" element={<RequireAuth redirectTo="/login"><Main /></RequireAuth>} />
 						<Route path="/login" element={<Login />} />
+						<Route path="/policy" element={<Policy />} />
 					</Routes>
 				</div>
 				<Footer />

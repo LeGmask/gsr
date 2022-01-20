@@ -1,0 +1,28 @@
+@import "../scss/colors";
+
+.Policy {
+	color: $nord6;
+	margin: 5%;
+	& h1 {
+		font-weight: 600;
+		font-size: 30px;
+		margin: 30px 0px;
+	}
+
+	& h2 {
+		font-weight: 500;
+		font-size: 24px;
+		margin: 20px 0px;
+	}
+
+	& p {
+		font-weight: 300;
+		margin: 20px 0px;
+		line-height: 1.2em;
+
+		& a {
+			color: $nord6;
+			font-weight: 400;
+		}
+	}
+}
