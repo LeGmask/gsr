@@ -3,6 +3,7 @@ import SheetApi, { SchemaDayInterface } from '../../utils/GoogleApi';
 
 import "./Card.scss"
 import { useState } from 'react';
+import { Registered } from './Registered';
 
 export interface ICardProps {
 	index: number
@@ -27,7 +28,8 @@ export function Card({index, day, schemaDays, sheetApi, sheetSplit, sheetIndex}:
 				{ !schemaDays.locked ? 
 						register
 						? 
-							<p>Registered</p>
+						<Registered schemaDays={schemaDays} sheetIndex={sheetIndex} cardIndex={cardIndex} sheetSplit={sheetSplit} sheetApi={sheetApi} setIsRegister={(register:boolean) => (setIsregister(register))} />
+						
 						:
 						schemaDays.options.map((option, index) => (
 							<Options schemaOption={option} sheetIndex={sheetIndex} key={index} cardIndex={cardIndex} optionIndex={index} sheetSplit={sheetSplit} sheetApi={sheetApi} setIsRegister={() => (setIsregister(true))}/>

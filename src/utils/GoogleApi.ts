@@ -217,4 +217,31 @@ export default class SheetApi {
 		await sheet.saveUpdatedCells()
 		return schemasCopy
 	}
+
+	async unregister(sheetIndex: number, cardIndex: number, columnStart: number, schemas: SchemasList, split: number,  unregister: [number, number][]) {
+		await this.doc.loadInfo();
+
+		let schemaCopy = schemas[Object.keys(schemas)[sheetIndex - this.disabled]].schema
+		let schemaDay = schemaCopy[Object.keys(schemaCopy)[cardIndex]]
+		let count = []
+		for (let option of schemaDay.options) {
+			count.push(option.count)
+		}
+
+		const sheet = this.doc.sheetsByIndex[sheetIndex]; // or use doc.sheetsById[id] or doc.sheetsByTitle[title]
+		await sheet.loadCells({ // GridRange object, +2 because it's [A;B[  interval ...
+			startRowIndex: 2, endRowIndex: Math.max(...count) + 2, startColumnIndex:columnStart, endColumnIndex: columnStart+split+1
+		});
+
+		for (let index of unregister) {
+			delete schemaDay.options[index[0]].registered[index[1]]
+			let cell = sheet.getCell(index[1], columnStart + index[0])
+
+			cell.value = ''
+			cell.note = ''
+
+		}
+		await sheet.saveUpdatedCells()
+		return schemaDay
+	}
 }
