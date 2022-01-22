@@ -12,9 +12,10 @@ export interface IOptionsProps {
 	sheetSplit: number
 	setIsRegister: any
 	sheetIndex: number
+	isLocked: boolean
 }
 
-export function Options({schemaOption, cardIndex, optionIndex, sheetApi, sheetSplit, setIsRegister, sheetIndex}: IOptionsProps) {
+export function Options({schemaOption, cardIndex, optionIndex, sheetApi, sheetSplit, setIsRegister, sheetIndex, isLocked}: IOptionsProps) {
 	const { names } = useContext(NamesContext)
 	const { schemas, setSchemas } = useContext(SchemaContext)
 	const [active, setActive] = useState<Boolean>(false)
@@ -45,7 +46,7 @@ export function Options({schemaOption, cardIndex, optionIndex, sheetApi, sheetSp
 			 <div className="card_options_item_text" >Places: {Object.keys(schemaOption.registered).length}/{schemaOption.count}</div> :
 			 <div className="card_options_item_text" >{schemaOption.string.trim()}</div>
 			}
-			<RegisterButton state={getState()} style={{ "display": !active ? 'none' : 'inherit' }} onClick={() => (!isDisabled ? register() : null)}/>
+			{isLocked ? null : <RegisterButton state={getState()} style={{ "display": !active ? 'none' : 'inherit' }} onClick={() => (!isDisabled ? register() : null)}/> }
 		</div>
 	);
 }

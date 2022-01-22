@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import SheetApi, { SchemaDayInterface, SchemasList } from "../../utils/GoogleApi";
 import { SchemaContext } from "../SchemaContext";
+import {MdCancel} from "react-icons/md"
 
 export interface IOptionsProps {
 	schemaDays: SchemaDayInterface
@@ -8,10 +9,11 @@ export interface IOptionsProps {
 	cardIndex: number,
 	sheetSplit: number,
 	sheetApi: SheetApi,
-	setIsRegister: Function
+	setIsRegister: Function,
+	isLocked: boolean
 }
 
-export function Registered({schemaDays, sheetIndex, cardIndex, sheetSplit, sheetApi, setIsRegister}: IOptionsProps) {
+export function Registered({schemaDays, sheetIndex, cardIndex, sheetSplit, sheetApi, setIsRegister, isLocked}: IOptionsProps) {
 	const { schemas, setSchemas } = useContext(SchemaContext)
 	const [registered, setRegistered] = useState<[number,number][]>([])
 
@@ -51,14 +53,16 @@ export function Registered({schemaDays, sheetIndex, cardIndex, sheetSplit, sheet
 	}
 
 	return (
-		<div className='card_register_item' >
-			{
-				registered.map((index:any, arrayIndex) => (
-					<button key={arrayIndex} onClick={() => unregister([index])}>{schemaDays.options[index[0]].registered[index[1]].value}</button>
-					
-				))
-			}
-			<button onClick={() => unregister(registered, true)}>CANCEL</button>
+		<div className="card_unregister">
+			<ul className='card_unregister_item' >
+				{
+					registered.map((index:any, arrayIndex) => (
+						<li key={arrayIndex} >{schemaDays.options[index[0]].registered[index[1]].value} {isLocked ? null : <a  className="card_unregister_action" onClick={() => unregister([index])}><MdCancel /></a>}</li>
+						
+					))
+				}
+			</ul>
+			{isLocked ? null : <a className="card_unregister_global" onClick={() => unregister(registered, true)}>Cancel</a> }
 		</div>
 	);
 }
