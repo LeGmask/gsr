@@ -43,10 +43,10 @@ function App() {
 										<Main />
 									</RequireAuth>
 								}
-								/>
+							/>
 							<Route path="/login" element={<Login />} />
 							<Route path="/policy" element={<Policy />} />
-							<Route path='*' element={<Navigate to={"/app/"} />} />
+							<Route path="*" element={<Navigate to={'/app/'} />} />
 						</Routes>
 					</div>
 					<Footer />
