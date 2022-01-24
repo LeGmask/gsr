@@ -1,11 +1,11 @@
-@import "./scss/reset";
-@import "./scss/colors";
-@import "./scss/fonts";
+@import './scss/reset';
+@import './scss/colors';
+@import './scss/fonts';
 
 body {
 	width: 100%;
-  font-family: 'Rubik';
-  background-color: $nordDark;
+	font-family: 'Rubik';
+	background-color: $nordDark;
 }
 
 .content {
@@ -25,10 +25,10 @@ body {
 
 .h2_helper {
 	display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  text-decoration: underline;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	text-decoration: underline;
 	color: $nord6;
 	font-size: 30px;
 	padding-bottom: 5px;

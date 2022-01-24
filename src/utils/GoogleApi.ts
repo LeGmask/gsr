@@ -1,248 +1,289 @@
-import { GoogleSpreadsheet } from "google-spreadsheet";
-import { Name } from "../components/nameManager/NameManager";
+import { GoogleSpreadsheet } from 'google-spreadsheet';
+import { Name } from '../components/nameManager/NameManager';
 
 export interface SchemasList {
-	[week: string] : {
-		schema: SchemaInterface
-		splits: number
-	}
+	[week: string]: {
+		schema: SchemaInterface;
+		splits: number;
+	};
 }
 
 export interface SchemaInterface {
-	[day: string]: SchemaDayInterface
+	[day: string]: SchemaDayInterface;
 }
 
 export interface SchemaDayInterface {
-	registered: boolean,
-	locked: boolean,
-	options: Array<SchemaOptionInterface>
+	registered: boolean;
+	locked: boolean;
+	options: Array<SchemaOptionInterface>;
 }
 
 export interface SchemaOptionInterface {
-	count: number,
-	string: string,
-	registered: { [id: number]: {value: string, note: string} },
-
+	count: number;
+	string: string;
+	registered: { [id: number]: { value: string; note: string } };
 }
 
 export default class SheetApi {
 	doc: GoogleSpreadsheet;
 	schema: any;
 	userEmail: string | null;
-	disabled: number
-
+	disabled: number;
 
 	constructor(docID: string) {
 		// test doc : '18wEM5Qcl_gEL25EzoX3E2aWK-8YYlupZA9HoTZ4-MeU'
 		this.doc = new GoogleSpreadsheet(docID);
-		let token = localStorage.getItem("accessToken")
-		this.userEmail = localStorage.getItem("userEmail")
+		let token = localStorage.getItem('accessToken');
+		this.userEmail = localStorage.getItem('userEmail');
 		if (!token) {
-			throw new Error("invalid token")
+			throw new Error('invalid token');
 		}
-		this.doc.useRawAccessToken(token ? token : "");
-		
-		this.getSchema = this.getSchema.bind(this)
-		this.register = this.register.bind(this)
+		this.doc.useRawAccessToken(token ? token : '');
 
-		this.disabled = 1
+		this.getSchema = this.getSchema.bind(this);
+		this.register = this.register.bind(this);
+
+		this.disabled = 1;
 	}
 
 	async getNumberOfSheets() {
 		await this.doc.loadInfo(); // loads document properties and worksheets
-		return this.doc.sheetsByIndex.length
+		return this.doc.sheetsByIndex.length;
 	}
-	
+
 	correctIndex(index: number) {
-		return index + this.disabled
+		return index + this.disabled;
 	}
 
 	private addDays(days: number) {
-		var result = new Date("12/30/1899");
+		var result = new Date('12/30/1899');
 		result.setDate(result.getDate() + days);
 		return result;
 	}
 
 	async getSchema(sheetIndex: number) {
-
 		await this.doc.loadInfo(); // loads document properties and worksheets
 
+		const sheet = this.doc.sheetsByIndex[sheetIndex];
+		await sheet.loadHeaderRow();
 
-		const sheet = this.doc.sheetsByIndex[sheetIndex]; 
-		await sheet.loadHeaderRow()
-
-		let days = sheet.headerValues.filter(e => e); 
-
+		let days = sheet.headerValues.filter((e) => e);
 
 		await sheet.loadCells('A1:Z2');
-		let options: Array<string> = []
+		let options: Array<string> = [];
 		for (let i = 0; sheet.getCell(1, i).value; i++) {
-			options.push(String(sheet.getCell(1, i).value))
+			options.push(String(sheet.getCell(1, i).value));
 		}
 
-		let schema: SchemaInterface = {}
-		let split = options.length / days.length
+		let schema: SchemaInterface = {};
+		let split = options.length / days.length;
 
-		for (let i in days) { // add options str
-			schema[days[i]] = Object(options.slice(Number(i) * split, (Number(i) + 1) * split))
+		for (let i in days) {
+			// add options str
+			schema[days[i]] = Object(options.slice(Number(i) * split, (Number(i) + 1) * split));
 		}
 
 		// Here we drop allready passed days
-		let ignoreIndex: Number[] = []
+		let ignoreIndex: Number[] = [];
 		for (let i in days) {
-			let date = this.addDays(Number(sheet.getCell(0, Number(i) * split).value))
-			let today = new Date(Date.now())
-			today.setHours(0,0,0,0) // set today to midnight to permit comparaison between date and today
+			let date = this.addDays(Number(sheet.getCell(0, Number(i) * split).value));
+			let today = new Date(Date.now());
+			today.setHours(0, 0, 0, 0); // set today to midnight to permit comparaison between date and today
 			if (date < today) {
-				ignoreIndex.push(Number(i))
+				ignoreIndex.push(Number(i));
 			}
 		}
 
 		// TODO: avoid loading when not need by simply adding an empty object ... (and symplify main.tsx)
 		// Load sheets
 		if (ignoreIndex.length < days.length) {
-			await sheet.loadCells('A2:Z100')
+			await sheet.loadCells('A2:Z100');
 		}
-
 
 		for (let day in Object.keys(schema)) {
 			let key = Object.keys(schema)[day];
 			let schemaDay: SchemaDayInterface = {
 				registered: false,
 				locked: false,
-				options: []
-			}
+				options: [],
+			};
 
 			// skip if day allready passed ...
 			if (ignoreIndex.indexOf(Number(day)) === -1) {
 				for (let option in schema[key]) {
-					let temp: any = schema[key]
-					let column = Number(day) * split + Number(option)
+					let temp: any = schema[key];
+					let column = Number(day) * split + Number(option);
 					var schemaOptions: SchemaOptionInterface = {
 						count: 0,
 						string: temp[option],
-						registered: {}
-					}
-					try { // dirty try catch but sometimes borders value is inacessible and dunno why but that permit to fix the script ...
-						for (let i = 2; sheet.getCell(i, column).borders || sheet.getCell(i+1, column).borders; i++) {
-							schemaOptions.count++
-							let cell = sheet.getCell(i, column)
-							if (cell.value && cell.valueType === "stringValue") {
-								schemaOptions.registered[Number(i)] = {value: String(cell.value), note:cell.note}
-							} else if (cell.value && cell.valueType === "numberValue") {
-								schemaDay.locked = true
+						registered: {},
+					};
+					try {
+						// dirty try catch but sometimes borders value is inacessible and dunno why but that permit to fix the script ...
+						for (let i = 2; sheet.getCell(i, column).borders || sheet.getCell(i + 1, column).borders; i++) {
+							schemaOptions.count++;
+							let cell = sheet.getCell(i, column);
+							if (cell.value && cell.valueType === 'stringValue') {
+								schemaOptions.registered[Number(i)] = {
+									value: String(cell.value),
+									note: cell.note,
+								};
+							} else if (cell.value && cell.valueType === 'numberValue') {
+								schemaDay.locked = true;
 							}
 
 							// Handle if register
-							if (cell.note ===  `gsr-${localStorage.getItem("userEmail")}`) {
-								schemaDay.registered = true
+							if (cell.note === `gsr-${localStorage.getItem('userEmail')}`) {
+								schemaDay.registered = true;
 							}
 
 							// Handle some bad case *
-							if (JSON.stringify(sheet.getCell(i, column).backgroundColor) === JSON.stringify({ red: 0.8, green: 0.8, blue: 0.8 }) ||
-								JSON.stringify(sheet.getCell(i, column).backgroundColor) === JSON.stringify({ red: 0.7411765, green: 0.7411765, blue: 0.7411765 })
-							) { // if cells are gray and gulf closed ..., if prod most simple is to avoid put these column just put nothing ^^
-								schemaDay.locked = true
+							if (
+								JSON.stringify(sheet.getCell(i, column).backgroundColor) ===
+									JSON.stringify({
+										red: 0.8,
+										green: 0.8,
+										blue: 0.8,
+									}) ||
+								JSON.stringify(sheet.getCell(i, column).backgroundColor) ===
+									JSON.stringify({
+										red: 0.7411765,
+										green: 0.7411765,
+										blue: 0.7411765,
+									})
+							) {
+								// if cells are gray and gulf closed ..., if prod most simple is to avoid put these column just put nothing ^^
+								schemaDay.locked = true;
 							}
 						}
-					}
-					catch { }
+					} catch {}
 
-					schemaDay.options.push(schemaOptions)
+					schemaDay.options.push(schemaOptions);
 				}
 			}
-			schema[key] = schemaDay // set default if not found
+			schema[key] = schemaDay; // set default if not found
 		}
-		this.schema = schema
+		this.schema = schema;
 		return {
 			schema,
 			split,
-			week: sheet.title
-		}
+			week: sheet.title,
+		};
 	}
 
 	private findMissing(array: number[], max: number): number[] {
-		const missing = []
+		const missing = [];
 		for (let i = 2; i <= max; i++) {
-			if (!array.includes(i)) { // Checking whether i(current value) present in num(argument)
+			if (!array.includes(i)) {
+				// Checking whether i(current value) present in num(argument)
 				missing.push(i); // Adding numbers which are not in num(argument) array
 			}
 		}
 		return missing;
 	}
 
-	async register(sheetIndex: number, column: number, names: Name[], schemas: SchemasList, split: number, cardIndex: number, optionIndex: number) {
+	async register(
+		sheetIndex: number,
+		column: number,
+		names: Name[],
+		schemas: SchemasList,
+		split: number,
+		cardIndex: number,
+		optionIndex: number
+	) {
 		await this.doc.loadInfo();
 
 		// Get the correct schema option:
-		let schemasCopy = JSON.parse(JSON.stringify(schemas))
-		let schemaCopy = schemasCopy[Object.keys(schemasCopy)[sheetIndex - this.disabled]].schema
-		let schemaDay = schemaCopy[Object.keys(schemaCopy)[cardIndex]]
-		let schemaOption = schemaDay.options[optionIndex]
-		let keys = Object.keys(schemaOption.registered).map((key) => Number(key))
-		let places: number[] | undefined = this.findMissing(keys, schemaOption.count + 1) // all possible places in the sheet
+		let schemasCopy = JSON.parse(JSON.stringify(schemas));
+		let schemaCopy = schemasCopy[Object.keys(schemasCopy)[sheetIndex - this.disabled]].schema;
+		let schemaDay = schemaCopy[Object.keys(schemaCopy)[cardIndex]];
+		let schemaOption = schemaDay.options[optionIndex];
+		let keys = Object.keys(schemaOption.registered).map((key) => Number(key));
+		let places: number[] | undefined = this.findMissing(keys, schemaOption.count + 1); // all possible places in the sheet
 
 		const sheet = this.doc.sheetsByIndex[sheetIndex]; // or use doc.sheetsById[id] or doc.sheetsByTitle[title]
-		await sheet.loadCells({ // GridRange object, +2 because it's [A;B[  interval ...
-			startRowIndex: 2, endRowIndex: schemaOption.count + 2, startColumnIndex:column, endColumnIndex: column+1
+		await sheet.loadCells({
+			// GridRange object, +2 because it's [A;B[  interval ...
+			startRowIndex: 2,
+			endRowIndex: schemaOption.count + 2,
+			startColumnIndex: column,
+			endColumnIndex: column + 1,
 		});
 
 		// drop updated cell
-		let remove: Number[] = []
+		let remove: Number[] = [];
 		for (let place of places) {
-			let cell = sheet.getCell(place, column)
+			let cell = sheet.getCell(place, column);
 			if (cell.value !== null) {
-				schemaOption.registered[places[place]] = {value: String(cell.value), note: cell.note}
-				remove.push(place)
+				schemaOption.registered[places[place]] = {
+					value: String(cell.value),
+					note: cell.note,
+				};
+				remove.push(place);
 			}
 		}
-		places = places.filter(function(value) {
+		places = places.filter(function (value) {
 			return remove.indexOf(value) === -1;
-	   	})
+		});
 
 		for (let name of names) {
 			if (places.length) {
-				let cell = sheet.getCell(places[0], column)
-				cell.value = name.name + (name.vege ? " Vege" : "")
-				cell.note = `gsr-${localStorage.getItem("userEmail")}`
-				schemaOption.registered[places[0]] = {value: name.name + (name.vege ? " Vege" : ""), note: `gsr-${localStorage.getItem("userEmail")}`}
-				places.shift()
+				let cell = sheet.getCell(places[0], column);
+				cell.value = name.name + (name.vege ? ' Vege' : '');
+				cell.note = `gsr-${localStorage.getItem('userEmail')}`;
+				schemaOption.registered[places[0]] = {
+					value: name.name + (name.vege ? ' Vege' : ''),
+					note: `gsr-${localStorage.getItem('userEmail')}`,
+				};
+				places.shift();
 			} else {
-				console.log("ya plus de place ...")
-			}			
+				console.log('ya plus de place ...');
+			}
 		}
-		schemaDay.registered = true
-		schemaDay.options[optionIndex] = schemaOption
-		schemasCopy[Object.keys(schemasCopy)[sheetIndex - this.disabled]].schema[Object.keys(schemasCopy[Object.keys(schemasCopy)[sheetIndex - this.disabled]].schema)[cardIndex]] = schemaDay
-		await sheet.saveUpdatedCells()
-		return schemasCopy
+		schemaDay.registered = true;
+		schemaDay.options[optionIndex] = schemaOption;
+		schemasCopy[Object.keys(schemasCopy)[sheetIndex - this.disabled]].schema[
+			Object.keys(schemasCopy[Object.keys(schemasCopy)[sheetIndex - this.disabled]].schema)[cardIndex]
+		] = schemaDay;
+		await sheet.saveUpdatedCells();
+		return schemasCopy;
 	}
 
-	async unregister(sheetIndex: number, cardIndex: number, columnStart: number, schemas: SchemasList, split: number,  unregister: [number, number][]) {
+	async unregister(
+		sheetIndex: number,
+		cardIndex: number,
+		columnStart: number,
+		schemas: SchemasList,
+		split: number,
+		unregister: [number, number][]
+	) {
 		await this.doc.loadInfo();
- 
-		let schemasCopy:SchemasList = JSON.parse(JSON.stringify(schemas))
-		let schemaCopy = schemasCopy[Object.keys(schemas)[sheetIndex - this.disabled]].schema
-		let schemaDay = schemaCopy[Object.keys(schemaCopy)[cardIndex]]
-		let count = []
+
+		let schemasCopy: SchemasList = JSON.parse(JSON.stringify(schemas));
+		let schemaCopy = schemasCopy[Object.keys(schemas)[sheetIndex - this.disabled]].schema;
+		let schemaDay = schemaCopy[Object.keys(schemaCopy)[cardIndex]];
+		let count = [];
 		for (let option of schemaDay.options) {
-			count.push(option.count)
+			count.push(option.count);
 		}
 
 		const sheet = this.doc.sheetsByIndex[sheetIndex]; // or use doc.sheetsById[id] or doc.sheetsByTitle[title]
-		await sheet.loadCells({ // GridRange object, +2 we start at index 2...
-			startRowIndex: 2, endRowIndex: Math.max(...count) + 2, startColumnIndex:columnStart, endColumnIndex: columnStart+split+1
+		await sheet.loadCells({
+			// GridRange object, +2 we start at index 2...
+			startRowIndex: 2,
+			endRowIndex: Math.max(...count) + 2,
+			startColumnIndex: columnStart,
+			endColumnIndex: columnStart + split + 1,
 		});
 
 		for (let index of unregister) {
-			delete schemaDay.options[index[0]].registered[index[1]]
-			let cell = sheet.getCell(index[1], columnStart + index[0])
+			delete schemaDay.options[index[0]].registered[index[1]];
+			let cell = sheet.getCell(index[1], columnStart + index[0]);
 
-			cell.value = ''
-			cell.note = ''
-
+			cell.value = '';
+			cell.note = '';
 		}
-		await sheet.saveUpdatedCells()
-		return schemaDay
+		await sheet.saveUpdatedCells();
+		return schemaDay;
 	}
 }

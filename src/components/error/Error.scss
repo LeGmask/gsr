@@ -1,5 +1,4 @@
-@import "../../scss/colors";
-
+@import '../../scss/colors';
 
 .error_popup {
 	padding: 15px;
@@ -22,7 +21,6 @@
 
 	&:not(:first-child) {
 		margin-top: 10px;
-
 	}
 
 	&_container {
@@ -41,6 +39,5 @@
 			height: 24px;
 			width: 24px;
 		}
-
 	}
 }

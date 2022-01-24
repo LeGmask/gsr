@@ -1,6 +1,4 @@
-@import "../../scss/colors";
-
-
+@import '../../scss/colors';
 
 .card {
 	background-color: $nord2;
@@ -8,7 +6,7 @@
 	border-radius: 20px;
 	color: $nord6;
 	margin: 10px;
-	box-shadow: 0 1px 4px rgba(0,0,0,.15);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 	max-width: 300px;
 
 	&_locked {
@@ -44,7 +42,6 @@
 		}
 
 		&_control {
-
 			&.regular {
 				cursor: pointer;
 				background-color: $nord14;
@@ -89,7 +86,7 @@
 		}
 
 		&_action {
-			transition: all ease-in-out .3s;
+			transition: all ease-in-out 0.3s;
 			cursor: pointer;
 			margin-left: 10px;
 			display: flex;
@@ -106,7 +103,7 @@
 			}
 		}
 
-		&_global { 
+		&_global {
 			border: 1px solid;
 			height: 26px;
 			text-decoration: none;
@@ -117,7 +114,7 @@
 			line-height: 26px;
 			cursor: pointer;
 			font-weight: 500;
-			transition: all .3s ease-in-out;
+			transition: all 0.3s ease-in-out;
 			vertical-align: middle;
 			font-size: 14px;
 			padding-bottom: 3px;
