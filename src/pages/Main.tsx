@@ -8,7 +8,7 @@ import { SchemaContext } from '../components/SchemaContext';
 import { SheetIdManager } from '../components/sheetId/SheetIdManager';
 import SheetApi, { SchemaInterface, SchemasList } from '../utils/GoogleApi';
 
-import './Home.scss';
+import './Main.scss';
 
 function Main() {
 	const [loading, setLoading] = useState(false);

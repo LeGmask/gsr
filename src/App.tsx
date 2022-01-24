@@ -11,7 +11,6 @@ import { loadFromLocalStorage, NamesContext } from './components/NamesManagerCon
 import { Footer } from './components/footer/Footer';
 import { Policy } from './pages/Policy';
 import { ErrorsContext } from './components/ErrorsContext';
-import Test from './pages/test';
 import { Error, ErrorsInterface } from './components/error/Error';
 
 function App() {
@@ -38,16 +37,16 @@ function App() {
 					<div className="content">
 						<Routes>
 							<Route
-								path="/"
+								path="/app/"
 								element={
 									<RequireAuth redirectTo="/login">
 										<Main />
 									</RequireAuth>
 								}
-							/>
+								/>
 							<Route path="/login" element={<Login />} />
 							<Route path="/policy" element={<Policy />} />
-							<Route path="/test" element={<Test />} />
+							<Route path='*' element={<Navigate to={"/app/"} />} />
 						</Routes>
 					</div>
 					<Footer />

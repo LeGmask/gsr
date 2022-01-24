@@ -9,7 +9,7 @@ function Login() {
 	const { user, setUser } = useContext(LoginContext);
 
 	if (user) {
-		return <Navigate to={'/'} />;
+		return <Navigate to={'/app/'} />;
 	}
 	return (
 		<>
