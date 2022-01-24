@@ -1,0 +1,46 @@
+@import "../../scss/colors";
+
+
+.error_popup {
+	padding: 15px;
+	background-color: $nord11;
+	border-radius: 10px;
+	position: relative;
+	max-width: 500px;
+
+	&_title {
+		font-size: 20px;
+		color: $nord6;
+	}
+
+	&_message {
+		color: $nord5;
+		margin-top: 10px;
+		font-weight: 300;
+		line-height: 1.2em;
+	}
+
+	&:not(:first-child) {
+		margin-top: 10px;
+
+	}
+
+	&_container {
+		position: fixed;
+		bottom: 20px;
+		right: 20px;
+		z-index: 999;
+	}
+
+	&_close {
+		position: absolute;
+		right: 10px;
+		top: 10px;
+		color: $nord6;
+		svg {
+			height: 24px;
+			width: 24px;
+		}
+
+	}
+}

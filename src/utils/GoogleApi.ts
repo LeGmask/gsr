@@ -175,8 +175,8 @@ export default class SheetApi {
 		await this.doc.loadInfo();
 
 		// Get the correct schema option:
-		let schemasCopy = schemas
-		let schemaCopy = schemas[Object.keys(schemas)[sheetIndex - this.disabled]].schema
+		let schemasCopy = JSON.parse(JSON.stringify(schemas))
+		let schemaCopy = schemasCopy[Object.keys(schemasCopy)[sheetIndex - this.disabled]].schema
 		let schemaDay = schemaCopy[Object.keys(schemaCopy)[cardIndex]]
 		let schemaOption = schemaDay.options[optionIndex]
 		let keys = Object.keys(schemaOption.registered).map((key) => Number(key))
@@ -213,15 +213,16 @@ export default class SheetApi {
 		}
 		schemaDay.registered = true
 		schemaDay.options[optionIndex] = schemaOption
-		schemasCopy[Object.keys(schemas)[sheetIndex - this.disabled]].schema[Object.keys(schemas)[cardIndex]] = schemaDay
+		schemasCopy[Object.keys(schemasCopy)[sheetIndex - this.disabled]].schema[Object.keys(schemasCopy[Object.keys(schemasCopy)[sheetIndex - this.disabled]].schema)[cardIndex]] = schemaDay
 		await sheet.saveUpdatedCells()
 		return schemasCopy
 	}
 
 	async unregister(sheetIndex: number, cardIndex: number, columnStart: number, schemas: SchemasList, split: number,  unregister: [number, number][]) {
 		await this.doc.loadInfo();
-
-		let schemaCopy = schemas[Object.keys(schemas)[sheetIndex - this.disabled]].schema
+ 
+		let schemasCopy:SchemasList = JSON.parse(JSON.stringify(schemas))
+		let schemaCopy = schemasCopy[Object.keys(schemas)[sheetIndex - this.disabled]].schema
 		let schemaDay = schemaCopy[Object.keys(schemaCopy)[cardIndex]]
 		let count = []
 		for (let option of schemaDay.options) {
@@ -229,7 +230,7 @@ export default class SheetApi {
 		}
 
 		const sheet = this.doc.sheetsByIndex[sheetIndex]; // or use doc.sheetsById[id] or doc.sheetsByTitle[title]
-		await sheet.loadCells({ // GridRange object, +2 because it's [A;B[  interval ...
+		await sheet.loadCells({ // GridRange object, +2 we start at index 2...
 			startRowIndex: 2, endRowIndex: Math.max(...count) + 2, startColumnIndex:columnStart, endColumnIndex: columnStart+split+1
 		});
 

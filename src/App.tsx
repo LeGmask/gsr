@@ -10,27 +10,45 @@ import { Name } from './components/nameManager/NameManager';
 import { loadFromLocalStorage, NamesContext } from './components/NamesManagerContext';
 import { Footer } from './components/footer/Footer';
 import { Policy } from './pages/Policy';
+import { ErrorsContext } from './components/ErrorsContext';
+import Test from './pages/test';
+import { Error, ErrorsInterface } from './components/error/Error';
 
 function App() {
 	const [user, setUser] = useState<any>();
 	const [names, setNames] = useState<Name[]>(loadFromLocalStorage());
+	const [errors, setErrors] = useState<ErrorsInterface>([])
+
 	const setLoginInfo = (user:any) => {
-		console.log('Called setLoginInfo')
 		setUser(user)
 	}
 
 	return (
 		<LoginContext.Provider value={{user: user, setUser: setLoginInfo}}>
 			<NamesContext.Provider value={{names: names, setNames: setNames}}>
-				<Header />
-				<div className="content">
-					<Routes>
-						<Route path="/" element={<RequireAuth redirectTo="/login"><Main /></RequireAuth>} />
-						<Route path="/login" element={<Login />} />
-						<Route path="/policy" element={<Policy />} />
-					</Routes>
-				</div>
-				<Footer />
+				<ErrorsContext.Provider value={{errors: errors, setErrors: setErrors}}>
+					<Header />
+					{
+						Object.keys(errors).length ? 
+							<div className="error_popup_container">
+							{
+								Object.keys(errors).map((index) => (
+									<Error index={Number(index)} error={errors[Number(index)]} key={index}/>
+								))
+							}
+							</div> 
+						: null
+					}
+					<div className="content">
+						<Routes>
+							<Route path="/" element={<RequireAuth redirectTo="/login"><Main /></RequireAuth>} />
+							<Route path="/login" element={<Login />} />
+							<Route path="/policy" element={<Policy />} />
+							<Route path="/test" element={<Test />} />
+						</Routes>
+					</div>
+					<Footer />
+				</ErrorsContext.Provider>
 			</NamesContext.Provider>
 		</LoginContext.Provider>
 	);

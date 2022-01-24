@@ -2,6 +2,8 @@ import { useContext, useEffect, useState } from "react";
 import SheetApi, { SchemaDayInterface, SchemasList } from "../../utils/GoogleApi";
 import { SchemaContext } from "../SchemaContext";
 import {MdCancel} from "react-icons/md"
+import { ErrorsContext } from "../ErrorsContext";
+import { ErrorsInterface } from "../error/Error";
 
 export interface IOptionsProps {
 	schemaDays: SchemaDayInterface
@@ -14,10 +16,13 @@ export interface IOptionsProps {
 }
 
 export function Registered({schemaDays, sheetIndex, cardIndex, sheetSplit, sheetApi, setIsRegister, isLocked}: IOptionsProps) {
+	const {errors, setErrors} = useContext(ErrorsContext)
 	const { schemas, setSchemas } = useContext(SchemaContext)
+
 	const [registered, setRegistered] = useState<[number,number][]>([])
 
 	const updateRegistered = (schemaDays:SchemaDayInterface) => {
+		setRegistered([])
 		let state = false
 		for (let index in schemaDays.options) {
 			let option  = schemaDays.options[index]
@@ -36,19 +41,27 @@ export function Registered({schemaDays, sheetIndex, cardIndex, sheetSplit, sheet
 
 	useEffect(() => {
 		updateRegistered(schemaDays)			
-	}, [schemaDays])
+	}, [schemas])
 
 	let columnStart = Number(cardIndex) * sheetSplit
 
 	const unregister = async (unregisterIndex: any, reset=false) => {
-		let schemasCopy = schemas 
-		let schemaDaysUpdate = await sheetApi.unregister(sheetIndex, cardIndex, columnStart, schemas, sheetSplit, unregisterIndex)
-		schemasCopy[Object.keys(schemas)[sheetIndex - sheetApi.disabled]].schema[Object.keys(schemas)[cardIndex]] = schemaDaysUpdate
-		setSchemas(schemasCopy)
-		if (reset || !registered.filter((val) => !unregisterIndex.includes(val)).length ) {
-			setIsRegister(false)
-		} else {
-			setRegistered((prevRegistered) => (prevRegistered.filter((val) => !unregisterIndex.includes(val))))
+		try {
+			let schemasCopy:SchemasList = {...schemas}
+			let schemaDay = schemasCopy[Object.keys(schemas)[sheetIndex - sheetApi.disabled]].schema
+			let schemaDaysUpdate = await sheetApi.unregister(sheetIndex, cardIndex, columnStart, schemas, sheetSplit, unregisterIndex)
+			schemasCopy[Object.keys(schemas)[sheetIndex - sheetApi.disabled]].schema[Object.keys(schemaDay)[cardIndex]] = schemaDaysUpdate
+			if (reset || !registered.filter((val) => !unregisterIndex.includes(val)).length ) {
+				setIsRegister(false)
+			} else {
+				setRegistered((prevRegistered) => (prevRegistered.filter((val) => !unregisterIndex.includes(val))))	
+			}
+			setSchemas(schemasCopy)
+		} catch (e) {
+			setErrors((prevErrors:ErrorsInterface) => ({
+				...prevErrors,
+				[Object.keys(prevErrors).length]: e
+			}))
 		}
 	}
 

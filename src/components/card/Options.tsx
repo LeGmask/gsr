@@ -1,5 +1,7 @@
 import { useContext, useState } from 'react';
 import SheetApi, { SchemaOptionInterface } from '../../utils/GoogleApi';
+import { ErrorsInterface } from '../error/Error';
+import { ErrorsContext } from '../ErrorsContext';
 import { NamesContext } from '../NamesManagerContext';
 import { SchemaContext } from '../SchemaContext';
 import { RegisterButton, State } from './RegisterButton';
@@ -10,13 +12,14 @@ export interface IOptionsProps {
 	optionIndex: number
 	sheetApi: SheetApi
 	sheetSplit: number
-	setIsRegister: any
 	sheetIndex: number
 	isLocked: boolean
 }
 
-export function Options({schemaOption, cardIndex, optionIndex, sheetApi, sheetSplit, setIsRegister, sheetIndex, isLocked}: IOptionsProps) {
+export function Options({schemaOption, cardIndex, optionIndex, sheetApi, sheetSplit, sheetIndex, isLocked}: IOptionsProps) {
 	const { names } = useContext(NamesContext)
+	const {errors, setErrors} = useContext(ErrorsContext)
+
 	const { schemas, setSchemas } = useContext(SchemaContext)
 	const [active, setActive] = useState<Boolean>(false)
 
@@ -36,8 +39,14 @@ export function Options({schemaOption, cardIndex, optionIndex, sheetApi, sheetSp
 	let column = Number(cardIndex) * sheetSplit + Number(optionIndex)
 
 	const register = async () => {
-		setSchemas(await sheetApi.register(sheetIndex, column, names, schemas, sheetSplit, cardIndex, optionIndex))
-		setIsRegister()
+		try {
+			setSchemas(await sheetApi.register(sheetIndex, column, names, schemas, sheetSplit, cardIndex, optionIndex))
+		} catch (e) {
+			setErrors((prevErrors:ErrorsInterface) => ({
+				...prevErrors,
+				[Object.keys(prevErrors).length]: e
+			}))
+		}
 	}
 
 	return (
