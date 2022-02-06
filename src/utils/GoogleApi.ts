@@ -242,11 +242,8 @@ export default class SheetApi {
 		}
 		schemaDay.registered = true;
 		schemaDay.options[optionIndex] = schemaOption;
-		schemasCopy[Object.keys(schemasCopy)[sheetIndex - this.disabled]].schema[
-			Object.keys(schemasCopy[Object.keys(schemasCopy)[sheetIndex - this.disabled]].schema)[cardIndex]
-		] = schemaDay;
 		await sheet.saveUpdatedCells();
-		return schemasCopy;
+		return schemaDay;
 	}
 
 	async unregister(
