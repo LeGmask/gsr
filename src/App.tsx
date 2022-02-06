@@ -13,6 +13,7 @@ import { Policy } from './pages/Policy';
 import { ErrorsContext } from './components/ErrorsContext';
 import { Error, ErrorsInterface } from './components/error/Error';
 import { Home } from './pages/Home';
+import Config from './components/config/Config';
 
 function App() {
 	const [user, setUser] = useState<any>();
@@ -53,6 +54,10 @@ function App() {
 							/>
 							<Route path="/login" element={<Login />} />
 							<Route path="/policy" element={<Policy />} />
+							<Route
+								path="config/:sheetId"
+								element={<Config />}
+							/>
 							<Route path="*" element={<Navigate to={'/app/'} />} />
 						</Routes>
 					</div>
