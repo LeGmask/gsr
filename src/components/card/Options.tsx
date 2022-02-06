@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import SheetApi, { SchemaOptionInterface } from '../../utils/GoogleApi';
+import SheetApi, { SchemaOptionInterface, SchemasList } from '../../utils/GoogleApi';
 import { ErrorsInterface } from '../error/Error';
 import { ErrorsContext } from '../ErrorsContext';
 import { NamesContext } from '../NamesManagerContext';
@@ -47,7 +47,27 @@ export function Options({
 
 	const register = async () => {
 		try {
-			setSchemas(await sheetApi.register(sheetIndex, column, names, schemas, sheetSplit, cardIndex, optionIndex));
+			// console.log({
+			// 	...schemas,
+			// 	[Object.keys(schemas)[sheetIndex - sheetApi.disabled]] : {
+			// 		...schemas[Object.keys(schemas)[sheetIndex - sheetApi.disabled]],
+			// 		schemas: {
+			// 			...schemas[Object.keys(schemas)[sheetIndex - sheetApi.disabled]].schema,
+			// 			[Object.keys(schemas[Object.keys(schemas)[sheetIndex - sheetApi.disabled]].schema)[cardIndex]] : "ksdjglmqksdjflmskj"
+			// 		}
+			// 	}
+			// })
+			let schemaDay = await sheetApi.register(sheetIndex, column, names, schemas, sheetSplit, cardIndex, optionIndex)
+			setSchemas((prevSchemas: SchemasList) => ({
+				...prevSchemas,
+				[Object.keys(prevSchemas)[sheetIndex - sheetApi.disabled]] : {
+					...prevSchemas[Object.keys(prevSchemas)[sheetIndex - sheetApi.disabled]],
+					schema: {
+						...prevSchemas[Object.keys(prevSchemas)[sheetIndex - sheetApi.disabled]].schema,
+						[Object.keys(prevSchemas[Object.keys(prevSchemas)[sheetIndex - sheetApi.disabled]].schema)[cardIndex]] : schemaDay
+					}
+				}
+			}))
 		} catch (e) {
 			setErrors((prevErrors: ErrorsInterface) => ({
 				...prevErrors,
