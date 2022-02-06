@@ -1,7 +1,7 @@
 import { ReactChild, ReactChildren, useContext, useEffect, useState } from 'react';
 
 import './App.scss';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { LoginContext } from './components/LoginContext';
 import { Header } from './components/header/Header';
 import Main from './pages/Main';
@@ -12,11 +12,17 @@ import { Footer } from './components/footer/Footer';
 import { Policy } from './pages/Policy';
 import { ErrorsContext } from './components/ErrorsContext';
 import { Error, ErrorsInterface } from './components/error/Error';
+import { Home } from './pages/Home';
 
 function App() {
 	const [user, setUser] = useState<any>();
 	const [names, setNames] = useState<Name[]>(loadFromLocalStorage());
 	const [errors, setErrors] = useState<ErrorsInterface>([]);
+	const { pathname } = useLocation();
+
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, [pathname]);
 
 	const setLoginInfo = (user: any) => {
 		setUser(user);
@@ -36,6 +42,7 @@ function App() {
 					) : null}
 					<div className="content">
 						<Routes>
+							<Route path="/" element={<Home />} />
 							<Route
 								path="/app/"
 								element={

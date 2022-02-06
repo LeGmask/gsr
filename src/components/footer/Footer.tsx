@@ -3,6 +3,7 @@ import logo from '../../images/logo_sbr.png';
 import { VscGithub } from 'react-icons/vsc';
 
 import './Footer.scss';
+import { Link } from 'react-router-dom';
 
 export interface IFooterProps {}
 
@@ -23,6 +24,11 @@ export function Footer(props: IFooterProps) {
 					<span>
 						© 2022 ‒ <a href="https://evann.tech">Evann "LeGmask" DREUMONT</a>
 					</span>
+				</div>
+				<div className="footer__nav">
+					<Link to="/" >Home</Link>
+					<Link to="/app">App</Link>
+					<Link to ="/policy">Policy</Link>
 				</div>
 			</div>
 		</footer>
