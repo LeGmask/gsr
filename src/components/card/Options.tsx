@@ -47,16 +47,6 @@ export function Options({
 
 	const register = async () => {
 		try {
-			// console.log({
-			// 	...schemas,
-			// 	[Object.keys(schemas)[sheetIndex - sheetApi.disabled]] : {
-			// 		...schemas[Object.keys(schemas)[sheetIndex - sheetApi.disabled]],
-			// 		schemas: {
-			// 			...schemas[Object.keys(schemas)[sheetIndex - sheetApi.disabled]].schema,
-			// 			[Object.keys(schemas[Object.keys(schemas)[sheetIndex - sheetApi.disabled]].schema)[cardIndex]] : "ksdjglmqksdjflmskj"
-			// 		}
-			// 	}
-			// })
 			let schemaDay = await sheetApi.register(sheetIndex, column, names, schemas, sheetSplit, cardIndex, optionIndex)
 			setSchemas((prevSchemas: SchemasList) => ({
 				...prevSchemas,
