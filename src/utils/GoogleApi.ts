@@ -236,6 +236,13 @@ export default class SheetApi {
 					note: `gsr-${localStorage.getItem('userEmail')}`,
 				};
 				places.shift();
+				
+				// Format cell, and if lbm set color to red
+				cell.textFormat = {
+					fontSize: 14,
+					fontFamily: 'Arial',
+					foregroundColor: {red: /\blbm[1-2]\b/g.test(name.name.toLowerCase()) ? 1 :0, green: 0, blue: 0, alpha: 1},
+				}
 			} else {
 				console.log('ya plus de place ...');
 			}
