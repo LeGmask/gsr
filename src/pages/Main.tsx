@@ -22,8 +22,8 @@ function Main() {
 
 	async function updateSchema() {
 		if (localStorage.getItem('sheetId')) {
+			setLoading(true);
 			try {
-				setLoading(true);
 				let sheetNumber = await sheetApi.getNumberOfSheets();
 				for (let i = sheetApi.disabled; i < sheetNumber; i++) {
 					let sheet = await sheetApi.getSchema(i);
@@ -35,13 +35,13 @@ function Main() {
 						},
 					}));
 				}
-				setLoading(false);
 			} catch (e) {
 				setErrors((prevErrors: ErrorsInterface) => ({
 					...prevErrors,
 					[Object.keys(prevErrors).length]: e,
 				}));
 			}
+			setLoading(false);
 		}
 	}
 
