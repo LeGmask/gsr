@@ -26,11 +26,13 @@
 	&_container {
 		position: fixed;
 		bottom: 20px;
-		right: 20px;
+		right: 2%;
+		margin-left: 2%;
 		z-index: 999;
 	}
 
 	&_close {
+		cursor: pointer;
 		position: absolute;
 		right: 10px;
 		top: 10px;

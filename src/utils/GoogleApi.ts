@@ -193,6 +193,12 @@ export default class SheetApi {
 	) {
 		await this.doc.loadInfo();
 
+		names = names.filter(name => name.name)
+
+		if (!names.length) {
+			throw new Error("Unable to register a ghost, please complete step 2 before attempting to register.")
+		}
+
 		// Get the correct schema option:
 		let schemasCopy = JSON.parse(JSON.stringify(schemas));
 		let schemaCopy = schemasCopy[Object.keys(schemasCopy)[sheetIndex - this.disabled]].schema;
