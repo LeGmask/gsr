@@ -1,16 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { MdOutlineSave } from 'react-icons/md';
 import { Card } from '../components/card/Card';
+import { ErrorsContext } from '../components/ErrorsContext';
 import { Loader } from '../components/loader/Loader';
+
+import SheetApi, { SchemaInterface, SchemasList } from '../utils/GoogleApi';
 
 import { NameManager } from '../components/nameManager/NameManager';
 import { SchemaContext } from '../components/SchemaContext';
 import { SheetIdManager } from '../components/sheetId/SheetIdManager';
-import SheetApi, { SchemaInterface, SchemasList } from '../utils/GoogleApi';
 
 import './Main.scss';
+import { ErrorsInterface } from '../components/error/Error';
 
 function Main() {
+	const { errors, setErrors } = useContext(ErrorsContext);
 	const [loading, setLoading] = useState(false);
 	const [schemas, setSchemas] = useState<SchemasList>({});
 	var sheetApi = new SheetApi(localStorage.getItem('sheetId') || '');
@@ -18,19 +22,26 @@ function Main() {
 
 	async function updateSchema() {
 		if (localStorage.getItem('sheetId')) {
-			setLoading(true);
-			let sheetNumber = await sheetApi.getNumberOfSheets();
-			for (let i = sheetApi.disabled; i < sheetNumber; i++) {
-				let sheet = await sheetApi.getSchema(i);
-				setSchemas((prevSchemas) => ({
-					...prevSchemas,
-					[sheet.week]: {
-						schema: sheet.schema,
-						splits: sheet.split,
-					},
+			try {
+				setLoading(true);
+				let sheetNumber = await sheetApi.getNumberOfSheets();
+				for (let i = sheetApi.disabled; i < sheetNumber; i++) {
+					let sheet = await sheetApi.getSchema(i);
+					setSchemas((prevSchemas) => ({
+						...prevSchemas,
+						[sheet.week]: {
+							schema: sheet.schema,
+							splits: sheet.split,
+						},
+					}));
+				}
+				setLoading(false);
+			} catch (e) {
+				setErrors((prevErrors: ErrorsInterface) => ({
+					...prevErrors,
+					[Object.keys(prevErrors).length]: e,
 				}));
 			}
-			setLoading(false);
 		}
 	}
 
