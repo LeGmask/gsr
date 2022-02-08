@@ -193,6 +193,12 @@ export default class SheetApi {
 	) {
 		await this.doc.loadInfo();
 
+		names = names.filter(name => name.name)
+
+		if (!names.length) {
+			throw new Error("Unable to register a ghost, please complete step 2 before attempting to register.")
+		}
+
 		// Get the correct schema option:
 		let schemasCopy = JSON.parse(JSON.stringify(schemas));
 		let schemaCopy = schemasCopy[Object.keys(schemasCopy)[sheetIndex - this.disabled]].schema;
@@ -236,6 +242,13 @@ export default class SheetApi {
 					note: `gsr-${localStorage.getItem('userEmail')}`,
 				};
 				places.shift();
+				
+				// Format cell, and if lbm set color to red
+				cell.textFormat = {
+					fontSize: 14,
+					fontFamily: 'Arial',
+					foregroundColor: {red: /\blbm[1-2]\b/g.test(name.name.toLowerCase()) ? 1 :0, green: 0, blue: 0, alpha: 1},
+				}
 			} else {
 				console.log('ya plus de place ...');
 			}
