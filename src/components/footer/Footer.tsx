@@ -26,9 +26,9 @@ export function Footer(props: IFooterProps) {
 					</span>
 				</div>
 				<div className="footer__nav">
-					<Link to="/" >Home</Link>
+					<Link to="/">Home</Link>
 					<Link to="/app">App</Link>
-					<Link to ="/policy">Policy</Link>
+					<Link to="/policy">Policy</Link>
 				</div>
 			</div>
 		</footer>

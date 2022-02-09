@@ -77,8 +77,6 @@ footer {
 			color: $nord6;
 		}
 	}
-
-	
 }
 
 .footer__nav {
@@ -87,14 +85,14 @@ footer {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	
+
 	a {
 		color: $nord5;
 		text-decoration: none;
 		margin-right: 5px;
 		padding-left: 5px;
 		border-left: 1px solid $nord0;
-		transition: all ease-in-out .3s;
+		transition: all ease-in-out 0.3s;
 
 		&:first-child {
 			border-left: none;
@@ -103,9 +101,6 @@ footer {
 		&:hover {
 			color: $nord10;
 			text-decoration: underline;
-
 		}
-
 	}
-	
 }

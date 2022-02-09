@@ -63,34 +63,35 @@ export default class SheetApi {
 
 	async getSchema(sheetIndex: number) {
 		await this.doc.loadInfo(); // loads document properties and worksheets
-		let headerRowIndex = 0
+		let headerRowIndex = 0;
 
 		const sheet = this.doc.sheetsByIndex[sheetIndex];
 
-		try { // if header empty, because of a new line before the start of the sheet, there is an exception but this isn't important in our case
+		try {
+			// if header empty, because of a new line before the start of the sheet, there is an exception but this isn't important in our case
 			await sheet.loadHeaderRow();
 		} catch {}
 
 		// ugly fix : when no data in the first cell try next line, if more than 10 lines breack and throw new error
-		while (headerRowIndex <= 10 && (!sheet.headerValues || !sheet.headerValues[0])){
-			headerRowIndex++
+		while (headerRowIndex <= 10 && (!sheet.headerValues || !sheet.headerValues[0])) {
+			headerRowIndex++;
 			try {
-				await sheet.loadHeaderRow(headerRowIndex+1);
+				await sheet.loadHeaderRow(headerRowIndex + 1);
 			} catch {}
 		}
 
 		if (!sheet.headerValues || !sheet.headerValues[0]) {
-			throw new Error(`The sheet n°${sheetIndex+1} seems to be without data, skipping...`)
+			throw new Error(`The sheet n°${sheetIndex + 1} seems to be without data, skipping...`);
 		}
-		
-		console.log(sheet.headerValues)
+
+		console.log(sheet.headerValues);
 		let days = sheet.headerValues.filter((e) => e);
 
 		// plus 2 and 3 beacause 1 based index
-		await sheet.loadCells(`A${headerRowIndex+1}:Z${headerRowIndex+2}`);
+		await sheet.loadCells(`A${headerRowIndex + 1}:Z${headerRowIndex + 2}`);
 		let options: Array<string> = [];
-		for (let i = 0; sheet.getCell(headerRowIndex+1, i).value; i++) {
-			options.push(String(sheet.getCell(headerRowIndex+1, i).value));
+		for (let i = 0; sheet.getCell(headerRowIndex + 1, i).value; i++) {
+			options.push(String(sheet.getCell(headerRowIndex + 1, i).value));
 		}
 
 		let schema: SchemaInterface = {};
@@ -104,7 +105,7 @@ export default class SheetApi {
 		// Here we drop allready passed days
 		let ignoreIndex: Number[] = [];
 		for (let i in days) {
-			console.log(headerRowIndex)
+			console.log(headerRowIndex);
 			let date = this.addDays(Number(sheet.getCell(headerRowIndex, Number(i) * split).value));
 			let today = new Date(Date.now());
 			today.setHours(0, 0, 0, 0); // set today to midnight to permit comparaison between date and today
@@ -116,7 +117,7 @@ export default class SheetApi {
 		// TODO: avoid loading when not need by simply adding an empty object ... (and symplify main.tsx)
 		// Load sheets
 		if (ignoreIndex.length < days.length) {
-			await sheet.loadCells(`A${headerRowIndex+2}:Z100`);
+			await sheet.loadCells(`A${headerRowIndex + 2}:Z100`);
 		}
 
 		for (let day in Object.keys(schema)) {
@@ -139,9 +140,14 @@ export default class SheetApi {
 					};
 					try {
 						// dirty try catch but sometimes borders value is inacessible and dunno why but that permit to fix the script ...
-						for (let i = 2; sheet.getCell(headerRowIndex+i, column).borders || sheet.getCell(headerRowIndex + i + 1, column).borders; i++) {
+						for (
+							let i = 2;
+							sheet.getCell(headerRowIndex + i, column).borders ||
+							sheet.getCell(headerRowIndex + i + 1, column).borders;
+							i++
+						) {
 							schemaOptions.count++;
-							let cell = sheet.getCell(headerRowIndex+i, column);
+							let cell = sheet.getCell(headerRowIndex + i, column);
 							if (cell.value && cell.valueType === 'stringValue') {
 								schemaOptions.registered[Number(i)] = {
 									value: String(cell.value),
@@ -158,13 +164,13 @@ export default class SheetApi {
 
 							// Handle some bad case *
 							if (
-								JSON.stringify(sheet.getCell(headerRowIndex+i, column).backgroundColor) ===
+								JSON.stringify(sheet.getCell(headerRowIndex + i, column).backgroundColor) ===
 									JSON.stringify({
 										red: 0.8,
 										green: 0.8,
 										blue: 0.8,
 									}) ||
-								JSON.stringify(sheet.getCell(headerRowIndex+i, column).backgroundColor) ===
+								JSON.stringify(sheet.getCell(headerRowIndex + i, column).backgroundColor) ===
 									JSON.stringify({
 										red: 0.7411765,
 										green: 0.7411765,
@@ -212,10 +218,10 @@ export default class SheetApi {
 	) {
 		await this.doc.loadInfo();
 
-		names = names.filter(name => name.name)
+		names = names.filter((name) => name.name);
 
 		if (!names.length) {
-			throw new Error("Unable to register a ghost, please complete step 2 before attempting to register.")
+			throw new Error('Unable to register a ghost, please complete step 2 before attempting to register.');
 		}
 
 		// Get the correct schema option:
@@ -261,13 +267,18 @@ export default class SheetApi {
 					note: `gsr-${localStorage.getItem('userEmail')}`,
 				};
 				places.shift();
-				
+
 				// Format cell, and if lbm set color to red
 				cell.textFormat = {
 					fontSize: 14,
 					fontFamily: 'Arial',
-					foregroundColor: {red: /\blbm[1-2]\b/g.test(name.name.toLowerCase()) ? 1 :0, green: 0, blue: 0, alpha: 1},
-				}
+					foregroundColor: {
+						red: /\blbm[1-2]\b/g.test(name.name.toLowerCase()) ? 1 : 0,
+						green: 0,
+						blue: 0,
+						alpha: 1,
+					},
+				};
 			} else {
 				console.log('ya plus de place ...');
 			}
