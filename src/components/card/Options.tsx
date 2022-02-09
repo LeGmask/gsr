@@ -46,24 +46,24 @@ export function Options({
 	let column = Number(cardIndex) * sheetSplit + Number(optionIndex);
 
 	const register = async () => {
-		try {
-			let schemaDay = await sheetApi.register(sheetIndex, column, names, schemas, sheetSplit, cardIndex, optionIndex)
-			setSchemas((prevSchemas: SchemasList) => ({
-				...prevSchemas,
-				[Object.keys(prevSchemas)[sheetIndex - sheetApi.disabled]] : {
-					...prevSchemas[Object.keys(prevSchemas)[sheetIndex - sheetApi.disabled]],
-					schema: {
-						...prevSchemas[Object.keys(prevSchemas)[sheetIndex - sheetApi.disabled]].schema,
-						[Object.keys(prevSchemas[Object.keys(prevSchemas)[sheetIndex - sheetApi.disabled]].schema)[cardIndex]] : schemaDay
-					}
+		// try {
+		let schemaDay = await sheetApi.register(sheetIndex, column, names, schemas, sheetSplit, cardIndex, optionIndex)
+		setSchemas((prevSchemas: SchemasList) => ({
+			...prevSchemas,
+			[Object.keys(prevSchemas)[sheetIndex - sheetApi.disabled]] : {
+				...prevSchemas[Object.keys(prevSchemas)[sheetIndex - sheetApi.disabled]],
+				schema: {
+					...prevSchemas[Object.keys(prevSchemas)[sheetIndex - sheetApi.disabled]].schema,
+					[Object.keys(prevSchemas[Object.keys(prevSchemas)[sheetIndex - sheetApi.disabled]].schema)[cardIndex]] : schemaDay
 				}
-			}))
-		} catch (e) {
-			setErrors((prevErrors: ErrorsInterface) => ({
-				...prevErrors,
-				[Object.keys(prevErrors).length]: e,
-			}));
-		}
+			}
+		}))
+		// } catch (e) {
+		// 	setErrors((prevErrors: ErrorsInterface) => ({
+		// 		...prevErrors,
+		// 		[Object.keys(prevErrors).length]: e,
+		// 	}));
+		// }
 	};
 
 	return (
