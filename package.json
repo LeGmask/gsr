@@ -9,6 +9,7 @@
 	},
 	"private": true,
 	"dependencies": {
+		"@types/google-spreadsheet": "https://github.com/LeGmask/types_node_spreadsheets",
 		"buffer": "^6.0.3",
 		"gapi-script": "^1.2.0",
 		"google-spreadsheet": "https://github.com/LeGmask/node-google-spreadsheet.git",
@@ -50,7 +51,6 @@
 		"@testing-library/jest-dom": "^5.14.1",
 		"@testing-library/react": "^12.0.0",
 		"@testing-library/user-event": "^13.2.1",
-		"@types/google-spreadsheet": "^3.1.5",
 		"@types/jest": "^27.0.1",
 		"@types/node": "^16.7.13",
 		"@types/react": "^17.0.20",

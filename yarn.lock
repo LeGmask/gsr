@@ -1665,10 +1665,9 @@
     "@types/qs" "*"
     "@types/serve-static" "*"
 
-"@types/google-spreadsheet@^3.1.5":
-  version "3.1.5"
-  resolved "https://registry.yarnpkg.com/@types/google-spreadsheet/-/google-spreadsheet-3.1.5.tgz#2bdc6f9f5372551e0506cb6ef3f562adcf44fc2e"
-  integrity sha512-7N+mDtZ1pmya2RRFPPl4KYc2TRgiqCNBLUZfyrKfER+u751JgCO+C24/LzF70UmUm/zhHUbzRZ5mtfaxekQ1ZQ==
+"@types/google-spreadsheet@https://github.com/LeGmask/types_node_spreadsheets":
+  version "0.0.0"
+  resolved "https://github.com/LeGmask/types_node_spreadsheets#99f541f7a5e48f33ed35d8cfd2b3441629bd4b77"
 
 "@types/graceful-fs@^4.1.2":
   version "4.1.5"
